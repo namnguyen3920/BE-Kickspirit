@@ -5,7 +5,7 @@ const morgan = require("morgan");
 const db = require("./services/db");
 const userRoute = require("./routes/usersRoutes");
 const productRoute = require("./routes/productRoutes");
-const categoryRoute = require("./routes/category");
+const categoryRoute = require("./routes/categoryRoutes");
 
 const port = process.env.PORT || 3920;
 

@@ -1,14 +1,23 @@
-const router = require("express").Router();
-const db = require("../services/db");
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/userController');
 
-//GET USER 
-router.get('/', async (req, res) => {
-    try {
-      const [results] = await db.execute('SELECT * FROM users');
-      res.status(200).json(results);
-    } catch (err) {
-      res.status(500).json({ error: 'Error fetching users', message: err.message });
-    }
-  });
+//GET USER BY ID
+router.get('/:id', userController.getUsersById);
+
+//GET USER BY NAME
+router.get('/:username', userController.getUsersByName);
+
+//GET ALL USERS
+router.get('/', userController.getAllUsers);
+
+//POST USER
+router.post('/add-user', userController.addUsers);
+
+//MODIFY USER
+router.post('/update-user/:id', userController.modifyUser);
+
+//DELETE USER
+router.delete('/del-user/:id', userController.deleteUserById);
 
 module.exports = router;
