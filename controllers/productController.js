@@ -11,9 +11,7 @@ exports.getAllProducts = async (req, res) => {
 
 exports.getProductsById = async (req, res) => {
     try {
-
         const products = await productModels.getProductsById(req.params.id);
-        console.log("It got the products!", products);
         res.status(200).json(products);
     }
     catch (err) {
@@ -38,17 +36,26 @@ exports.addProduct = async (req, res) => {
     }
 }
 
-exports.deleteProduct = async (req, res) => {
-    const { product_id } = req.body;
+exports.deleteProduct = async (req, res) => {   
     try {
-        const productDel = await productModels.deleteProduct(product_id);
-        if (productDel) {
-            res.status(200).json({ message: "Product deleted" });
-        } else {
+        const result = await productModels.deleteProduct(req.params.id);                 
+        if (!result) {
             res.status(404).json({ message: "Product not found" });
         }
+        res.status(200).json({ message: "Product deleted" });
     }
     catch (err) {
         res.status(400).json({ message: "Cannot delete product", error: err.message });
+    }
+}
+
+exports.modifyProduct = async (req, res) => {
+    const product = req.body;
+    const id = req.params.id;
+    try {        
+        const result = await productModels.modifyProduct(id, product);
+        res.status(200).json({ message: "Product updated" , product: result});
+    } catch (err){
+        res.status(400).json({ message: err.message });
     }
 }

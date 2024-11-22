@@ -8,6 +8,7 @@ const pool = mysql.createPool({
     user     : process.env.MYSQL_USER,
     password : process.env.MYSQL_PASSWORD,
     database : process.env.MYSQL_DB,
+    port     : process.env.MYSQL_PORT,
     queueLimit: 0,    
     connectionLimit : 1000,
 });
@@ -21,8 +22,6 @@ async function testConnection() {
         console.error('Error connecting to MySQL:', err);
     }
 }
-
-
 
 testConnection();
 

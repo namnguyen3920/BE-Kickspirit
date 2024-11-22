@@ -11,7 +11,10 @@ router.get('/', productController.getAllProducts);
 //POST PRODUCT
 router.post('/add-product', productController.addProduct);
 
+//MODIFY PRODUCT
+router.post('/update-product/:id', productController.modifyProduct);
+
 //DELETE PRODUCT
-router.delete('/:id', productController.deleteProduct);
+router.delete('/del-product/:id', productController.deleteProduct);
 
 module.exports = router;

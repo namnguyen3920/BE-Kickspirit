@@ -35,19 +35,46 @@ const createProduct = async (name, description, price, stock, category_id, img) 
 
 const deleteProduct = async (id) => {
     try {
-        let query  = "DELETE FROM products WHERE id = ?";
+        let query = "DELETE FROM products WHERE product_id = ?";
         const [results] = await pool.execute(query, [id]);
-        console.log(results.affectedRows);
-        return results.affectedRows > 0;
+        return results;
     }
     catch (err) {
         throw err;
     }
 }
 
+const modifyProduct = (id, product, callback) => {
+    const updates = [];
+    const values = [];
+
+    Object.entries(product).forEach(([key, value]) => {
+        if (value !== null) {
+            updates.push(`${key} = ?`);
+            values.push(value);
+        }
+    });
+
+    if (updates.length === 0) {
+        return callback(null, { message: 'No fields to update' });
+    }
+
+    values.push(id);
+
+    const query = `UPDATE products SET ${updates.join(', ')} WHERE product_id = ?`;
+
+    pool.execute(query, values, (err, results) => {
+        if (err) {
+            return callback(err);
+        }
+        callback(null, { id, ...product });
+    });
+};
+
 module.exports = {
     getAllProducts,
     getProductsById,
     createProduct,
     deleteProduct,
+    modifyProduct,
 };

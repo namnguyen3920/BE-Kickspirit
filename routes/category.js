@@ -10,10 +10,7 @@ router.post('/add-new', async (req, res) => {
       if (err) {
         return next(createError(500, 'Failed to add category', { original: err }));
       }
-      else {
-        res.status(200).json({ id: results.insertID, category_name});
-      }
-      
+      res.status(200).json({ id: results.insertID, category_name});
     });
 });
 
