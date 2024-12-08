@@ -31,11 +31,12 @@ const getUsersByUsername = async (username) => {
     }
 }
 
-const createUser = async (username, password, email, first_name, last_name, isAdmin) => {
+const createUser = async (userVal) => {
+    const { username, password, email, first_name, last_name } = userVal;
     try {
-        let query = "INSERT INTO users (username, password, email, first_name, last_name, isAdmin) VALUES (?, ?, ?, ?, ?, ?)";
-        const [results] = await pool.execute(query, [username, password, email, first_name, last_name, isAdmin]);
-        return {id: results.insertId, username, password, email, first_name, last_name, isAdmin};
+        let query = "INSERT INTO users (username, password, email, first_name, last_name) VALUES (?, ?, ?, ?, ?)";
+        const [results] = await pool.execute(query, [username, password, email, first_name, last_name]);
+        return {id: results.insertId, username, email, first_name, last_name};
     }
     catch (err) {
         throw err;

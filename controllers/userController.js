@@ -1,4 +1,8 @@
+
 const userModels = require('../models/userModels');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const salt = 10;
 
 exports.getAllUsers = async (req, res) => {
     try {
@@ -43,12 +47,21 @@ exports.getUsersByName = async (req, res) => {
 }
 
 exports.addUsers = async (req, res) => {
-    const { username, password, email, first_name, last_name, isAdmin } = req.body;
+    const { username, password, email, first_name, last_name } = req.body;
+
     try {
-        const newUser = await userModels.createUser(username, password, email, first_name, last_name, isAdmin);
-        res.status(201).json({ message: 'User added', user: newUser });
-    }
-    catch (err) {
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = await userModels.createUser({
+            username,
+            password: hashedPassword,
+            email,
+            first_name,
+            last_name,
+        });
+
+        res.status(201).json({ message: 'User added successfully', user: newUser });
+    } catch (err) {
         res.status(400).json({ message: err.message });
     }
 }
