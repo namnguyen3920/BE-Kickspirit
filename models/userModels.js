@@ -31,6 +31,17 @@ const getUsersByUsername = async (username) => {
     }
 }
 
+const getUsersByEmail = async (email) => {
+    try {
+        let query = "SELECT * FROM users WHERE email = ?";
+        const [rows] = await pool.execute(query, [email]);
+        return rows.length ? rows[0] : null;
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 const createUser = async (userVal) => {
     const { username, password, email, first_name, last_name } = userVal;
     try {
@@ -89,5 +100,6 @@ module.exports = {
     getUsersByUsername,
     createUser,
     deleteUserById,
-    modifyUser
+    modifyUser,
+    getUsersByEmail
 }

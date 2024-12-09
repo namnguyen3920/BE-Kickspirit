@@ -1,5 +1,7 @@
 
 const userModels = require('../models/userModels');
+const userServices = require('../services/userServices');
+const jwtHelper = require('../services/jwtHelper');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const salt = 10;
@@ -15,7 +17,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUsersById = async (req, res) => {
     try {
-        const users = await userModels.getUsersById(req.params.id);
+        const users = await userModels.getUsersById(req.query.id);
         res.status(200).json(users);
     }
     catch (err) {
@@ -30,37 +32,50 @@ exports.getUsersById = async (req, res) => {
 }
 
 exports.getUsersByName = async (req, res) => {
-    const { username } = req.body;
-    try {
-        const user = await userModels.getUsersByName(username);
-        res.status(200).json(user);
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username and password are required" });
     }
-    catch (err) {
-        if (err) {
-            return res.status(500).json(err);
-        }
-        if (results.length === 0) {
+
+    try {
+        const user = await userModels.getUsersByUsername(username);
+        if (!user || user.length === 0) {
             return res.status(404).json({ message: "User not found" });
         }
 
+        const passwordMatch = await bcrypt.compare(password, user[0].password);
+        if (passwordMatch) {
+            const token = jwtHelper.generateToken(user[0]);
+            return res.status(200).json({
+                message: 'Login successful',
+                token: token,
+                user: user[0],
+            });
+        } else {
+            return res.status(401).json({ message: 'Invalid password' });
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
 
 exports.addUsers = async (req, res) => {
     const { username, password, email, first_name, last_name } = req.body;
 
     try {
-        const hashedPassword = await bcrypt.hash(password, salt);
 
-        const newUser = await userModels.createUser({
+        const { newUser, token } = await userServices.registerUser({
             username,
-            password: hashedPassword,
+            password,
             email,
             first_name,
             last_name,
         });
 
-        res.status(201).json({ message: 'User added successfully', user: newUser });
+        res.status(201).json({ message: 'User added successfully', user: newUser, token });
     } catch (err) {
         res.status(400).json({ message: err.message });
     }
