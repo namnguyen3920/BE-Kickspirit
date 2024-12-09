@@ -6,7 +6,7 @@ const userController = require('../controllers/userController');
 router.get('/:id', userController.getUsersById);
 
 //GET USER BY NAME
-router.get('/:username', userController.getUsersByName);
+router.post('/login', userController.getUsersByName);
 
 //GET ALL USERS
 router.get('/', userController.getAllUsers);
