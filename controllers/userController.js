@@ -31,19 +31,14 @@ exports.getUsersById = async (req, res) => {
     }
 }
 
-exports.getUsersByName = async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ message: "Username and password are required" });
-    }
-
+exports.getUserForLogin = async (req, res) => {
     try {
+        const { username, password } = req.body;
         const user = await userModels.getUsersByUsername(username);
-        if (!user || user.length === 0) {
+        if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-
+        
         const passwordMatch = await bcrypt.compare(password, user[0].password);
         if (passwordMatch) {
             const token = jwtHelper.generateToken(user[0]);
@@ -56,14 +51,15 @@ exports.getUsersByName = async (req, res) => {
             return res.status(401).json({ message: 'Invalid password' });
         }
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Internal server error" });
+        console.error("Error: ", err);
+        console.log("Request body: ", req.body);
+        return res.status(500).json({ message: "Server error" });
     }
 };
 
 
 exports.addUsers = async (req, res) => {
-    const { username, password, email, first_name, last_name } = req.body;
+    const { username, password, email, first_name, last_name, isAdmin } = req.body;
 
     try {
 
@@ -73,11 +69,12 @@ exports.addUsers = async (req, res) => {
             email,
             first_name,
             last_name,
+            isAdmin
         });
 
         res.status(201).json({ message: 'User added successfully', user: newUser, token });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+        res.status(409).json({ message: err.message });
     }
 }
 

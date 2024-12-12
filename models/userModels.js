@@ -43,11 +43,11 @@ const getUsersByEmail = async (email) => {
 }
 
 const createUser = async (userVal) => {
-    const { username, password, email, first_name, last_name } = userVal;
+    const { username, password, email, first_name, last_name, isAdmin } = userVal;
     try {
-        let query = "INSERT INTO users (username, password, email, first_name, last_name) VALUES (?, ?, ?, ?, ?)";
-        const [results] = await pool.execute(query, [username, password, email, first_name, last_name]);
-        return {id: results.insertId, username, email, first_name, last_name};
+        let query = "INSERT INTO users (username, password, email, first_name, last_name, isAdmin) VALUES (?, ?, ?, ?, ?, ?)";
+        const [results] = await pool.execute(query, [username, password, email, first_name, last_name, isAdmin]);
+        return {id: results.insertId, username, email, first_name, last_name, isAdmin};
     }
     catch (err) {
         throw err;

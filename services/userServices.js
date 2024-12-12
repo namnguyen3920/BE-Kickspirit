@@ -3,11 +3,11 @@ const jwtHelper = require('../services/jwtHelper');
 const userModels = require('../models/userModels');
 const saltRounds = 10;
 
-exports.registerUser = async ({ username, password, email, first_name, last_name }) => {
-    
-    const existingUser = await userModels.getUsersByEmail(email);
-    if (existingUser) {
-        throw new Error('Email is already registered');
+exports.registerUser = async ({ username, password, email, first_name, last_name, isAdmin }) => {   
+    const userEmail = await userModels.getUsersByEmail(email)
+    const userUsername = await userModels.getUsersByUsername(username);
+    if (userEmail || userUsername.length > 0) {
+        throw new Error('User is already registered');
     }
 
     const salt = await bcrypt.genSalt(saltRounds);
@@ -19,6 +19,7 @@ exports.registerUser = async ({ username, password, email, first_name, last_name
         email,
         first_name,
         last_name,
+        isAdmin
     });
     
     const token = jwtHelper.generateToken({ id: newUser.id, username: newUser.username });
