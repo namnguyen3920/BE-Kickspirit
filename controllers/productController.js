@@ -1,4 +1,15 @@
 const productModels = require('../models/productModels');
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
+  const storage = multer.memoryStorage();
+  const upload = multer({ storage }).single("img");
 
 exports.getAllProducts = async (req, res) => {
     try {
@@ -28,9 +39,15 @@ exports.getProductsById = async (req, res) => {
 exports.addProduct = async (req, res) => {
     const { name, description, price, stock, category_id, img } = req.body;
     try {
-        const newProduct = await productModels.createProduct(name, description, price, stock, category_id, img);
-        res.status(201).json({ message: 'Product created', product: newProduct });
-    }
+        cloudinary.uploader.upload_stream(
+            { folder: "kickspirit" },
+            async (error, result) => {
+                if (error) return res.status(500).json({ error: "Error: " });
+                const newProduct = {name, description, price, stock, category_id, img: result.secure_url}
+                await productModels.createProduct(newProduct);
+                res.status(201).json({ message: 'Product added', product: newProduct });
+    }).end(req.file.buffer);
+}
     catch (err) {
         res.status(400).json({ message: err.message });
     }

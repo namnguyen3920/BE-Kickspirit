@@ -3,7 +3,11 @@ const DEFAULT_IMGURL = "https://res.cloudinary.com/dh75dmdfs/image/upload/v17315
 
 const getAllProducts = async (req, res) => {
     try {
-        const [results] = await pool.execute('SELECT * FROM products');
+        let query = `SELECT products.*, categories.category_name, brands.brand_name
+        FROM products 
+        LEFT JOIN categories ON products.category_id = categories.category_id
+        LEFT JOIN brands ON products.brand_id = brands.brand_id;`
+        const [results] = await pool.execute(query);
         return results;
     } catch (err) {
         throw err;
@@ -21,7 +25,8 @@ const getProductsById = async (id) => {
     }
 }
 
-const createProduct = async (name, description, price, stock, category_id, img) => {
+const createProduct = async (data) => {
+    const {name, description, price, stock, category_id, img} = data;
     try {
         const imgValue = img ? img : DEFAULT_IMGURL;
         let query = "INSERT INTO products (name, description, price, stock, category_id, img) VALUES (?, ?, ?, ?, ?, ?)";
