@@ -17,7 +17,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUsersById = async (req, res) => {
     try {
-        const users = await userModels.getUsersById(req.query.id);
+        const users = await userModels.getUsersById(req.params.id);
         res.status(200).json(users);
     }
     catch (err) {
@@ -40,6 +40,7 @@ exports.getUserForLogin = async (req, res) => {
         }
         
         const passwordMatch = await bcrypt.compare(password, user[0].password);
+        
         if (passwordMatch) {
             const token = jwtHelper.generateToken(user[0]);
             return res.status(200).json({

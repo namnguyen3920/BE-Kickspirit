@@ -37,13 +37,13 @@ exports.getProductsById = async (req, res) => {
 }
 
 exports.addProduct = async (req, res) => {
-    const { name, description, price, stock, category_id, img } = req.body;
+    const { name, description, price, category_id, brand_id, retail_price, img } = req.body;
     try {
         cloudinary.uploader.upload_stream(
             { folder: "kickspirit" },
             async (error, result) => {
                 if (error) return res.status(500).json({ error: "Error: " });
-                const newProduct = {name, description, price, stock, category_id, img: result.secure_url}
+                const newProduct = {name, description, price, category_id, brand_id, retail_price, img: result.secure_url}
                 await productModels.createProduct(newProduct);
                 res.status(201).json({ message: 'Product added', product: newProduct });
     }).end(req.file.buffer);
