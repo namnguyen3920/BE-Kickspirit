@@ -1,11 +1,11 @@
 const pool = require('../services/db');
-const DEFAULT_IMGURL = "https://res.cloudinary.com/dh75dmdfs/image/upload/v1731598559/f5506bd3c8026a2d9c8e07cfadd4b226_xtxnvr.jpg";
+const DEFAULT_IMGURL = "https://res.cloudinary.com/dfowalm4d/image/upload/v1736586041/cld-sample-5.jpg";
 
 const getAllProducts = async (req, res) => {
     try {
-        let query = `SELECT products.*, categories.category_name, brands.brand_name
+        let query = `SELECT products.*, category.category_name, brands.brand_name
         FROM products 
-        LEFT JOIN categories ON products.category_id = categories.category_id
+        LEFT JOIN category ON products.category_id = category.category_id
         LEFT JOIN brands ON products.brand_id = brands.brand_id;`
         const [results] = await pool.execute(query);
         return results;
@@ -26,12 +26,12 @@ const getProductsById = async (id) => {
 }
 
 const createProduct = async (data) => {
-    const {name, description, price, stock, category_id, img} = data;
+    const {name, description, price, stock, category_id, brand_id, retail_price, img} = data;
     try {
         const imgValue = img ? img : DEFAULT_IMGURL;
-        let query = "INSERT INTO products (name, description, price, stock, category_id, img) VALUES (?, ?, ?, ?, ?, ?)";
-        const [results] = await pool.execute(query, [name, description, price, stock, category_id, imgValue]);
-        return {id: results.insertId, name, description, price, stock, category_id, imgValue};
+        let query = "INSERT INTO products (name, description, category_id, brand_id, retail_price, img) VALUES (?, ?, ?, ?, ?, ?)";
+        const [results] = await pool.execute(query, [name, description, price, stock, category_id, brand_id, retail_price, imgValue]);
+        return {id: results.insertId, name, description, category_id, brand_id, retail_price, imgValue};
     }
     catch (err) {
         throw err;

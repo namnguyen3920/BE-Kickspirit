@@ -15,7 +15,7 @@ router.get('/', userController.getAllUsers);
 router.post('/add-user', userController.addUsers);
 
 //MODIFY USER
-router.post('/update-user/:id', userController.modifyUser);
+router.put('/update-user/:id', userController.modifyUser);
 
 //DELETE USER
 router.delete('/del-user/:id', userController.deleteUserById);
