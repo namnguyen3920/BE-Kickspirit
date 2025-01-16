@@ -93,10 +93,15 @@ exports.deleteUserById = async (req, res) => {
 }
 
 exports.modifyUser = async (req, res) => {
-    const user = req.body;
+    const { first_name, last_name } = req.body;
     const id = req.params.id;
+
+    if (!first_name || !last_name) {
+        return res.status(400).json({ message: "first_name and last_name are required" });
+    }
+
     try {        
-        const result = await userModels.modifyUser(id, user);
+        const result = await userModels.modifyUser(id, { first_name, last_name });
         res.status(200).json({ message: "User updated" , user: result});
     } catch (err){
         res.status(400).json({ message: err.message });

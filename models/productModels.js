@@ -26,12 +26,12 @@ const getProductsById = async (id) => {
 }
 
 const createProduct = async (data) => {
-    const {name, description, price, stock, category_id, brand_id, retail_price, img} = data;
+    const {product_name, description, category_id, brand_id, retail_price, img} = data;
     try {
         const imgValue = img ? img : DEFAULT_IMGURL;
-        let query = "INSERT INTO products (name, description, category_id, brand_id, retail_price, img) VALUES (?, ?, ?, ?, ?, ?)";
-        const [results] = await pool.execute(query, [name, description, price, stock, category_id, brand_id, retail_price, imgValue]);
-        return {id: results.insertId, name, description, category_id, brand_id, retail_price, imgValue};
+        let query = "INSERT INTO products (product_name, description, category_id, brand_id, retail_price, img) VALUES (?, ?, ?, ?, ?, ?)";
+        const [results] = await pool.execute(query, [product_name, description, category_id, brand_id, retail_price, imgValue]);
+        return {id: results.insertId, product_name, description, category_id, brand_id, retail_price, imgValue};
     }
     catch (err) {
         throw err;

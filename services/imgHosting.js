@@ -6,22 +6,30 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-exports.uploadToCloudinary = (fileStream, folder) => {
+exports.uploadToCloudinary = (fileBuffer, folder) => {
   return new Promise((resolve, reject) => {
     const options = {
-      folder: folder || "product",
+      folder: folder || "Product",
     };
 
     const stream = cloudinary.uploader.upload_stream(options, (error, result) => {
       if (error) {
+        console.error("Cloudinary Upload Error:", error);
         return reject(error);
       }
+      console.log("Cloudinary Upload Success:", result.secure_url);
       resolve(result.secure_url);
     });
 
-    fileStream.pipe(stream);
+    // Sử dụng Readable Stream từ `fileBuffer`
+    const { Readable } = require("stream");
+    const readableStream = new Readable();
+    readableStream.push(fileBuffer);
+    readableStream.push(null); // Kết thúc stream
+    readableStream.pipe(stream);
   });
 };
+
 
 exports.fetchBannersImages = async (folder) => {
     try {

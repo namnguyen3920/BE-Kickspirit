@@ -1,6 +1,7 @@
 const productModels = require('../models/productModels');
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
+const {uploadToCloudinary} = require('../services/imgHosting');
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,7 +10,6 @@ cloudinary.config({
   });
 
   const storage = multer.memoryStorage();
-  const upload = multer({ storage }).single("img");
 
 exports.getAllProducts = async (req, res) => {
     try {
@@ -37,20 +37,31 @@ exports.getProductsById = async (req, res) => {
 }
 
 exports.addProduct = async (req, res) => {
-    const { name, description, price, category_id, brand_id, retail_price, img } = req.body;
-    try {
-        cloudinary.uploader.upload_stream(
-            { folder: "kickspirit" },
-            async (error, result) => {
-                if (error) return res.status(500).json({ error: "Error: " });
-                const newProduct = {name, description, price, category_id, brand_id, retail_price, img: result.secure_url}
-                await productModels.createProduct(newProduct);
-                res.status(201).json({ message: 'Product added', product: newProduct });
-    }).end(req.file.buffer);
-}
-    catch (err) {
-        res.status(400).json({ message: err.message });
+    const { product_name, description, retail_price, category_id, brand_id } = req.body;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Image is required" });
     }
+console.log("req.file.stream", req.file.buffer);
+    const imageUrl = await uploadToCloudinary(req.file.buffer, "Product");
+
+    const newProduct = {
+        product_name,
+      description,
+      retail_price,
+      category_id,
+      brand_id,
+      img: imageUrl,
+    };
+
+    await productModels.createProduct(newProduct);
+
+    res.status(201).json({ message: "Product added", product: newProduct });
+  } catch (error) {
+    console.error("Error adding product:", error);
+    res.status(500).json({ message: error.message });
+  }
 }
 
 exports.deleteProduct = async (req, res) => {   

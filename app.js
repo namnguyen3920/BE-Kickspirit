@@ -6,6 +6,7 @@ const db = require("./services/db");
 const userRoute = require("./routes/usersRoutes");
 const productRoute = require("./routes/productRoutes");
 const categoryRoute = require("./routes/categoryRoutes");
+const brandRoute = require("./routes/brandRoutes");
 const generalRoute = require("./routes/generalRoutes");
 
 const port = process.env.PORT || 3920;
@@ -23,5 +24,6 @@ app.use(express.json());
 app.use("/api/users", userRoute);
 app.use("/api/products", productRoute);
 app.use("/api/category", categoryRoute);
+app.use("/api/brand", brandRoute);
 app.use("/api/general", generalRoute);
 app.use(cors({ origin: true }));
