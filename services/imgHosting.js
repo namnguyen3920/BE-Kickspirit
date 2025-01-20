@@ -21,11 +21,10 @@ exports.uploadToCloudinary = (fileBuffer, folder) => {
       resolve(result.secure_url);
     });
 
-    // Sử dụng Readable Stream từ `fileBuffer`
     const { Readable } = require("stream");
     const readableStream = new Readable();
     readableStream.push(fileBuffer);
-    readableStream.push(null); // Kết thúc stream
+    readableStream.push(null);
     readableStream.pipe(stream);
   });
 };
@@ -41,7 +40,7 @@ exports.fetchBannersImages = async (folder) => {
         .execute();
         if (!resources || resources.length === 0) {
             console.warn(`No images found in folder: ${folder}`);
-            return []; // Trả về mảng rỗng nếu không có ảnh
+            return [];
           }
       return resources.map((file) => file.secure_url);
     } catch (error) {

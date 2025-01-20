@@ -16,7 +16,10 @@ const getAllProducts = async (req, res) => {
 
 const getProductsById = async (id) => {
     try {
-        let query = "SELECT * FROM products WHERE product_id = ?";
+        let query = `SELECT products.*, category.category_name, brands.brand_name
+        FROM products 
+        LEFT JOIN category ON products.category_id = category.category_id
+        LEFT JOIN brands ON products.brand_id = brands.brand_id WHERE product_id = ?`;
         const [results] = await pool.execute(query, [id]);
         return results;
     }
